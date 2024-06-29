@@ -1,0 +1,7 @@
+# Uncomment this line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'Runner' do
+  use_frameworks!
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "665559661775",
+    "project_id": "testing-cli-b2f21",
+    "storage_bucket": "testing-cli-b2f21.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665559661775:android:588c14bbbedc5b9f858bba",
+        "android_client_info": {
+          "package_name": "com.example.fireeeeee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXL7nQ1i5M8iegA6HNIBBDv9jx7ijbXqs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
