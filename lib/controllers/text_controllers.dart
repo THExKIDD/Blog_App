@@ -16,5 +16,12 @@ class TextControllers{
     _obscureText.value = !_obscureText.value;
   }
 
+  RxBool loginObscure = true.obs;
+
+  void toggleLoginPass()
+  {
+    loginObscure.value = !loginObscure.value;
+  }
+
 
   }

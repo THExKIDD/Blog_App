@@ -1,7 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fireeeeee/controllers/text_controllers.dart';
 import 'package:fireeeeee/ui/auth/signup_screen.dart';
+import 'package:fireeeeee/ui/post/post_screen.dart';
+import 'package:fireeeeee/utils/utils.dart';
 import 'package:fireeeeee/widgets/round_button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +18,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextControllers tcontroller = TextControllers();
   final _formkey = GlobalKey<FormState>();
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  bool loading = false;
   @override
   void dispose() {
     // TODO: implement dispose
@@ -21,6 +28,27 @@ class _LoginScreenState extends State<LoginScreen> {
     tcontroller.passwordController;
 
   }
+
+  void login()
+  {
+    setState(() {
+      loading=true;
+    });
+    _auth.signInWithEmailAndPassword(email: tcontroller.emailController.text, password: tcontroller.passwordController.text).then((value) {
+      setState(() {
+        loading=false;
+      });
+      Utils().toastMessage(value.user!.email.toString());
+    }).onError((error , stackTrace){
+      setState(() {
+        loading=false;
+      });
+      Utils().toastMessage(error.toString());
+    });
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const PostScreen()));
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Form(
+          key: _formkey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -64,53 +93,68 @@ class _LoginScreenState extends State<LoginScreen> {
                 )
               ),
               const SizedBox(height: 10),
-              TextFormField(
+              Obx(() => TextFormField(
 
-                obscureText: true,
-                  controller: tcontroller.passwordController,
-                  decoration: const InputDecoration(
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.red,
-
+                  obscureText: tcontroller.loginObscure.value ? true : false,
+                    controller: tcontroller.passwordController,
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          icon: Icon(tcontroller.loginObscure.value ? Icons.lock : Icons.lock_open),
+                          onPressed: () => tcontroller.toggleLoginPass()
                       ),
-                      borderRadius: BorderRadius.horizontal(left: Radius.circular(10),right: Radius.circular(10)),
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+
+                        ),
+                        borderRadius: BorderRadius.horizontal(left: Radius.circular(10),right: Radius.circular(10)),
+                      ),
+                      prefixIcon: const Icon(Icons.lock_open),
+                      hintText: 'Enter Password...',
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.horizontal(left: Radius.circular(10),right: Radius.circular(10)),
+                      ),
                     ),
-                    prefixIcon: Icon(Icons.lock_open),
-                    hintText: 'Enter Password...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.horizontal(left: Radius.circular(10),right: Radius.circular(10)),
-                    ),
-                  ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter Password';
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Enter Password';
+                        }
+                        return null;
                       }
-                      return null;
-                    }
-                      ),
+
+                        ),
+              ),
               const SizedBox(height: 40),
 
               RoundButton(
                 title: 'Press',
+              loading: loading,
               onTap: (){
-                  if(_formkey.currentState!.validate())
+                  if(_formkey.currentState != null && _formkey.currentState!.validate())
                     {
-
+                      setState(() {
+                        loading =true;
+                      });
+                      login();
                     }
+
+
+
+
+
 
               },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Dont Have an Account?'),
+                  const Text('Dont Have an Account?'),
                   TextButton(onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => SignupScreen()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SignupScreen()));
                     
                   },
-                      child: Text('Sign Up'))
+                      child: const Text('Sign Up'))
                   
                 ],
               ),
