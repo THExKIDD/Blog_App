@@ -32,7 +32,15 @@ class _PostScreenState extends State<PostScreen> {
               icon: const Icon(Icons.logout)
           ),
           const SizedBox(width: 10),
+          
+          
         ],
+      ),
+      floatingActionButton: FloatingActionButton(onPressed: (){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => PostScreen()));
+        
+      },
+      child: Icon(Icons.add),
       ),
     );
   }
