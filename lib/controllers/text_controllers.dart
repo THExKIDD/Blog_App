@@ -23,5 +23,8 @@ class TextControllers{
     loginObscure.value = !loginObscure.value;
   }
 
+  final phoneNumberController = TextEditingController();
+  final verifyCOntroller = TextEditingController();
+
 
   }

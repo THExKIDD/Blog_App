@@ -1,5 +1,6 @@
 import 'package:fireeeeee/controllers/text_controllers.dart';
 import 'package:fireeeeee/ui/auth/Login_screen.dart';
+import 'package:fireeeeee/ui/auth/login_with_phone.dart';
 import 'package:fireeeeee/utils/utils.dart';
 import 'package:fireeeeee/widgets/round_button.dart';
 import 'package:flutter/material.dart';
@@ -128,6 +129,26 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: const Text('Login'))
 
                 ],
+              ),
+
+              InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginWithPhone()));
+                },
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                      color: Colors.black,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Sign in with Phone number '
+                    ),
+                  ),
+                ),
               ),
 
             ],
