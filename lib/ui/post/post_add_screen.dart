@@ -62,9 +62,12 @@ class _PostAddScreenState extends State<PostAddScreen> {
                   setState(() {
                     loading = true;
                   });
-                  databaseRef.child(DateTime.now().millisecondsSinceEpoch.toString()).set({
+
+                  String id = DateTime.now().millisecondsSinceEpoch.toString();
+
+                  databaseRef.child(id).set({
                     'title': tcontroller.postController.text.toString(),
-                    'objective': 'hanji',
+                    'objective': id,
                   }).then((value){
                     setState(() {
                       loading = false;

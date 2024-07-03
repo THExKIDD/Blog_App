@@ -1,12 +1,12 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:fireeeeee/ui/auth/Login_screen.dart';
-import 'package:fireeeeee/ui/post/post_add_screen.dart';
-import 'package:fireeeeee/utils/utils.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/utils.dart';
+import 'post_add_screen.dart';
 
 class PostScreen extends StatefulWidget {
   const PostScreen({super.key});
@@ -16,10 +16,12 @@ class PostScreen extends StatefulWidget {
 }
 
 class _PostScreenState extends State<PostScreen> {
+  final editor = TextEditingController();
   final searchFilter = TextEditingController();
   late FirebaseDatabase database;
   late DatabaseReference databaseRef;
   final auth = FirebaseAuth.instance;
+
   @override
   void initState() {
     super.initState();
@@ -29,7 +31,6 @@ class _PostScreenState extends State<PostScreen> {
     );
     databaseRef = database.ref('Post');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -41,95 +42,134 @@ class _PostScreenState extends State<PostScreen> {
         backgroundColor: Colors.purpleAccent,
         actions: [
           IconButton(
-              onPressed: (){
-                auth.signOut().then((value){Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
-                }).onError((error , stackTrace) {
-                  Utils().toastMessage(error.toString());
-                });
-              },
-              icon: const Icon(Icons.logout)
+            onPressed: () {
+              auth.signOut().then((value) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              }).onError((error, stackTrace) {
+                Utils().toastMessage(error.toString());
+              });
+            },
+            icon: const Icon(Icons.logout),
           ),
           const SizedBox(width: 10),
-          
-          
         ],
       ),
-      floatingActionButton: FloatingActionButton(onPressed: (){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const PostAddScreen()));
-        
-      },
-      child: const Icon(Icons.add),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const PostAddScreen()),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [
-          // Expanded(
-          //     child:StreamBuilder(
-          //       stream: databaseRef.onValue,
-          //       builder: (context, AsyncSnapshot<DatabaseEvent> snapshot){
-          //         if(!snapshot.hasData){
-          //           return CircularProgressIndicator();
-          //         }
-          //         else {
-          //           Map<dynamic, dynamic> map = snapshot.data!.snapshot.value as dynamic;
-          //           List<dynamic> list =[];
-          //           list.clear();
-          //           list= map.values.toList();
-          //           return ListView.builder(
-          //               itemCount: snapshot.data!.snapshot.children.length,
-          //               itemBuilder: (context, index) {
-          //                 return ListTile(
-          //                   title: Text(list[index]['title']),
-          //                   subtitle: Text(list[index]['objective']),
-          //                 );
-          //               });
-          //         }
-          //       },
-          //     ),
-          //     ),
-          SizedBox(height: 10,),
+          SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: TextFormField(
               controller: searchFilter,
               decoration: InputDecoration(
                 hintText: 'Search',
-                border: OutlineInputBorder()
+                border: OutlineInputBorder(),
               ),
-              onChanged: (String value){
-                setState(() {
-
-                });
+              onChanged: (String value) {
+                setState(() {});
               },
             ),
           ),
           Expanded(
-            child: FirebaseAnimatedList(query: databaseRef,
-                itemBuilder: (context , snapshot, animation, index){
-              final title = snapshot.child('title').value.toString();
+            child: FirebaseAnimatedList(
+              query: databaseRef,
+              itemBuilder: (context, snapshot, animation, index) {
+                final title = snapshot.child('title').value.toString();
 
-              if(searchFilter.text.isEmpty){
-                return ListTile(
-                  title: Text(snapshot.child('title').value.toString()),
-                  subtitle: Text(snapshot.child('objective').value.toString()),
-
-                );
-              }
-              else if(title.toLowerCase().contains(searchFilter.text.toLowerCase().toString())){
-                return ListTile(
-                  title: Text(snapshot.child('title').value.toString()),
-                  subtitle: Text(snapshot.child('objective').value.toString()),
-
-                );
-              }
-              else{
-                return Container();
-              }
-
-                }),
+                if (searchFilter.text.isEmpty) {
+                  return ListTile(
+                    title: Text(snapshot.child('title').value.toString()),
+                    subtitle: Text(snapshot.child('objective').value.toString()),
+                    trailing: PopupMenuButton(
+                      icon: Icon(Icons.more_vert),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text('edit'),
+                            leading: Icon(Icons.edit),
+                            onTap: () {
+                              Navigator.pop(context);
+                              showMyDialog(title, snapshot);
+                            },
+                          ),
+                        ),
+                        PopupMenuItem(
+                          child: ListTile(
+                            title: Text('delete'),
+                            leading: Icon(Icons.delete),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                } else if (title.toLowerCase().contains(searchFilter.text.toLowerCase().toString())) {
+                  return ListTile(
+                    title: Text(snapshot.child('title').value.toString()),
+                    subtitle: Text(snapshot.child('objective').value.toString()),
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
           ),
-
         ],
       ),
+    );
+  }
+
+  Future<void> showMyDialog(String title, DataSnapshot snapshot) async {
+    editor.text = title;
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update'),
+          content: Container(
+            height: 50,
+            child: TextField(
+              controller: editor,
+              decoration: InputDecoration(
+                hintText: 'Edit',
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                databaseRef.child(snapshot.key!).update({
+                  'title': editor.text.toLowerCase(),
+                  'objective': snapshot.child('objective').value.toString(),
+                }).then((value) {
+                  Utils().toastMessage('Post Updated');
+                }).onError((error, stackTrace) {
+                  Utils().toastMessage(error.toString());
+                });
+              },
+              child: Text('Edit'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
