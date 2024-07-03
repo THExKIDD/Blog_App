@@ -26,5 +26,7 @@ class TextControllers{
   final phoneNumberController = TextEditingController();
   final verifyCOntroller = TextEditingController();
 
+  final postController = TextEditingController();
+
 
   }
